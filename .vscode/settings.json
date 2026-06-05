@@ -1,0 +1,10 @@
+{
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "ruff.organizeImports": true,
+    "python.analysis.typeCheckingMode": "basic",
+    "files.insertFinalNewline": true,
+    "python-envs.defaultEnvManager": "ms-python.python:venv"
+}
