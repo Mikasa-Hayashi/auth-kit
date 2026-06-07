@@ -19,3 +19,8 @@ class UserResponse(BaseModel):
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
