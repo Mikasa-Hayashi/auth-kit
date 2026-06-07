@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.schemas.token import RefreshRequest, TokenPair
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import LoginRequest, UserCreate, UserResponse
 from app.services import auth as auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -18,7 +18,7 @@ async def register(
 
 
 @router.post("/login", response_model=TokenPair)
-async def login(data: UserCreate, db: AsyncSession = Depends(get_db)) -> TokenPair:
+async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)) -> TokenPair:
     return await auth_service.login_user(data.email, data.password, db)
 
 
