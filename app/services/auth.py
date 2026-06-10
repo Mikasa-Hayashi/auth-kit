@@ -17,6 +17,9 @@ from app.schemas.token import TokenPair
 from app.schemas.user import UserCreate
 from app.settings import settings
 
+BRUTE_FORCE_MAX_ATTEMPTS = 5
+BRUTE_FORCE_BASE_DELAY = 30
+
 
 async def register_user(data: UserCreate, db: AsyncSession) -> User:
     result = await db.execute(select(User).where(User.email == data.email))
@@ -96,3 +99,25 @@ async def _issue_token_pair(user_id: str) -> TokenPair:
     await redis.setex(f"refresh:{user_id}", int(ttl.total_seconds()), refresh)
 
     return TokenPair(access_token=access, refresh_token=refresh)
+
+
+async def _check_brute_force(email: str) -> None:
+    key = f"login_fail:{email}"
+    attempts = await redis.get(key)
+    if attempts and int(attempts) >= BRUTE_FORCE_MAX_ATTEMPTS:
+        ttl = await redis.ttl(key)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Account locked. Try again in {ttl} seconds",
+        )
+
+
+async def _record_failed_login(email: str) -> None:
+    key = f"login_fail:{email}"
+    attempts = await redis.incr(key)
+    delay = BRUTE_FORCE_BASE_DELAY * (2 ** (attempts - BRUTE_FORCE_MAX_ATTEMPTS))
+    await redis.expire(key, int(delay))
+
+
+async def _clear_failed_logins(email: str) -> None:
+    await redis.delete(f"login_fail:{email}")
