@@ -40,6 +40,8 @@ async def register_user(data: UserCreate, db: AsyncSession) -> User:
 
 
 async def login_user(email: str, password: str, db: AsyncSession) -> TokenPair:
+    await _check_brute_force(email)
+
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
 
@@ -48,6 +50,7 @@ async def login_user(email: str, password: str, db: AsyncSession) -> TokenPair:
         or not user.hashed_password
         or not verify_password(password, user.hashed_password)
     ):
+        await _record_failed_login(email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
@@ -57,6 +60,7 @@ async def login_user(email: str, password: str, db: AsyncSession) -> TokenPair:
             status_code=status.HTTP_403_FORBIDDEN, detail="Account disabled"
         )
 
+    await _clear_failed_logins(email)
     return await _issue_token_pair(user.id)
 
 
