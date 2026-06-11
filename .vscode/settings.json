@@ -6,5 +6,10 @@
     "ruff.organizeImports": true,
     "python.analysis.typeCheckingMode": "basic",
     "files.insertFinalNewline": true,
-    "python-envs.defaultEnvManager": "ms-python.python:venv"
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
 }
