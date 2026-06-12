@@ -4,12 +4,12 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api.auth import router as auth_router
-from app.api.users import router as users_router
-from app.db.session import get_db
-from app.middleware.rate_limit import RateLimitMiddleware
-from app.redis_client import redis
-from app.settings import settings
+from auth_kit.api.auth import router as auth_router
+from auth_kit.api.users import router as users_router
+from auth_kit.db.session import get_db
+from auth_kit.middleware.rate_limit import RateLimitMiddleware
+from auth_kit.redis_client import redis
+from auth_kit.settings import settings
 
 app = FastAPI(title="auth-kit")
 

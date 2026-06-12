@@ -1,8 +1,8 @@
 import factory
 from factory.alchemy import SQLAlchemyModelFactory
 
-from app.core.security import hash_password
-from app.models.user import User
+from auth_kit.core.security import hash_password
+from auth_kit.models.user import User
 
 
 class UserFactory(SQLAlchemyModelFactory):

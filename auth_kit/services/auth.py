@@ -5,18 +5,18 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import (
+from auth_kit.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
     hash_password,
     verify_password,
 )
-from app.models.user import User
-from app.redis_client import redis
-from app.schemas.token import TokenPair
-from app.schemas.user import UserCreate
-from app.settings import settings
+from auth_kit.models.user import User
+from auth_kit.redis_client import redis
+from auth_kit.schemas.token import TokenPair
+from auth_kit.schemas.user import UserCreate
+from auth_kit.settings import settings
 
 logger = logging.getLogger(__name__)
 

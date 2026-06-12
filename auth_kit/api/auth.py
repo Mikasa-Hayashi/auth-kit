@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
-from starlette.requests import Request
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.requests import Request
 
-from app.db.session import get_db
-from app.schemas.token import RefreshRequest, TokenPair
-from app.schemas.user import LoginRequest, UserCreate, UserResponse
-from app.services import auth as auth_service
-from app.services.oauth import get_google_redirect, handle_google_callback
+from auth_kit.db.session import get_db
+from auth_kit.schemas.token import RefreshRequest, TokenPair
+from auth_kit.schemas.user import LoginRequest, UserCreate, UserResponse
+from auth_kit.services import auth as auth_service
+from auth_kit.services.oauth import get_google_redirect, handle_google_callback
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

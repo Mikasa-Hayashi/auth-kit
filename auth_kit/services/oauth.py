@@ -5,9 +5,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.requests import Request
 
-from app.models.user import User
-from app.services.auth import _issue_token_pair
-from app.settings import settings
+from auth_kit.models.user import User
+from auth_kit.services.auth import _issue_token_pair
+from auth_kit.settings import settings
 
 oauth = OAuth()
 

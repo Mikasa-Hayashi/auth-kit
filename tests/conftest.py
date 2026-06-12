@@ -2,9 +2,9 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.db.session import Base, get_db
-from app.main import app
-from app.redis_client import redis
+from auth_kit.db.session import Base, get_db
+from auth_kit.main import app
+from auth_kit.redis_client import redis
 
 TEST_DATABASE_URL = "postgresql+asyncpg://authuser:authpass@localhost:5432/authdb_test"
 

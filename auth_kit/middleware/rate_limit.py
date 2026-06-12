@@ -2,7 +2,7 @@ from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.redis_client import redis
+from auth_kit.redis_client import redis
 
 RATE_LIMIT = 60
 WINDOW_SECONDS = 60
