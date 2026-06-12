@@ -119,8 +119,11 @@ async def _check_brute_force(email: str) -> None:
 async def _record_failed_login(email: str) -> None:
     key = f"login_fail:{email}"
     attempts = await redis.incr(key)
-    delay = BRUTE_FORCE_BASE_DELAY * (2 ** (attempts - BRUTE_FORCE_MAX_ATTEMPTS))
-    await redis.expire(key, int(delay))
+    if attempts == 1:
+        await redis.expire(key, 3600)
+    elif attempts >= BRUTE_FORCE_MAX_ATTEMPTS:
+        delay = BRUTE_FORCE_BASE_DELAY * (2 ** (attempts - BRUTE_FORCE_MAX_ATTEMPTS))
+        await redis.expire(key, int(delay))
 
 
 async def _clear_failed_logins(email: str) -> None:
