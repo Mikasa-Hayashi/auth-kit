@@ -59,4 +59,4 @@ async def test_update_me(client: AsyncClient, auth_headers: dict):
 
 async def test_me_requires_auth(client: AsyncClient):
     response = await client.get("/users/me")
-    assert response.status_code == 403
+    assert response.status_code == 401
