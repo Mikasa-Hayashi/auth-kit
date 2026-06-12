@@ -8,7 +8,7 @@ from app.models.user import User
 class UserFactory(SQLAlchemyModelFactory):
     class Meta:
         model = User
-        sqlalchemy_session_persistence = "commit"
+        sqlalchemy_session_persistence = None
 
     email = factory.Faker("email")  # type: ignore
     full_name = factory.Faker("name")  # type: ignore
