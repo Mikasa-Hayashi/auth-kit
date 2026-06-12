@@ -55,8 +55,20 @@ async def test_me_requires_auth(client: AsyncClient):
 
 
 async def test_register_weak_password(client: AsyncClient):
-    response = await client.post(
+    r = await client.post(
         "/auth/register",
         json={"email": "weak@example.com", "password": "abc"},
     )
-    assert response.status_code == 422
+    assert r.status_code == 422
+
+    r = await client.post(
+        "/auth/register",
+        json={"email": "weak@example.com", "password": "abcdefgh"},
+    )
+    assert r.status_code == 422
+
+    r = await client.post(
+        "/auth/register",
+        json={"email": "weak@example.com", "password": "12345678"},
+    )
+    assert r.status_code == 422
