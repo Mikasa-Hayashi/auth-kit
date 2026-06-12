@@ -8,15 +8,7 @@ from tests.factories import UserFactory
 @pytest.fixture
 async def auth_headers(client: AsyncClient, db_session: AsyncSession):
     UserFactory._meta.sqlalchemy_session = db_session  # type: ignore
-    UserFactory()
-
-    login = await client.post(
-        "/auth/login",
-        json={
-            "email": UserFactory._meta.sqlalchemy_session.info.get("last_email", ""),  # type: ignore
-            "password": "testpass123",
-        },
-    )
+    await db_session.flush()
 
     response = await client.post(
         "/auth/register",
@@ -60,3 +52,11 @@ async def test_update_me(client: AsyncClient, auth_headers: dict):
 async def test_me_requires_auth(client: AsyncClient):
     response = await client.get("/users/me")
     assert response.status_code == 401
+
+
+async def test_register_weak_password(client: AsyncClient):
+    response = await client.post(
+        "/auth/register",
+        json={"email": "weak@example.com", "password": "abc"},
+    )
+    assert response.status_code == 422
