@@ -1,5 +1,5 @@
 [project]
-name = "auth-kit"
+name = "fastapi-auth-bundle"
 version = "0.1.0"
 description = "A reusable FastAPI authentication module with JWT, Google OAuth, rate limiting and brute-force protection"
 readme = "README.md"

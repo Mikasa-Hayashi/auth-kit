@@ -14,9 +14,8 @@ A reusable FastAPI authentication module. Install via pip and add to any FastAPI
 ## Installation
 
 ```bash
-pip install auth-kit
+pip install fastapi-auth-bundle
 ```
-
 
 ## Quick start (standalone server)
 
