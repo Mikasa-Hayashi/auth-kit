@@ -1,3 +1,4 @@
+import logging
 from datetime import timedelta
 
 from fastapi import HTTPException, status
@@ -16,6 +17,8 @@ from app.redis_client import redis
 from app.schemas.token import TokenPair
 from app.schemas.user import UserCreate
 from app.settings import settings
+
+logger = logging.getLogger(__name__)
 
 BRUTE_FORCE_MAX_ATTEMPTS = 5
 BRUTE_FORCE_BASE_DELAY = 30
@@ -51,6 +54,7 @@ async def login_user(email: str, password: str, db: AsyncSession) -> TokenPair:
         or not verify_password(password, user.hashed_password)
     ):
         await _record_failed_login(email)
+        logger.warning("Failed login attempt for email: %s", email)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials"
         )
@@ -77,6 +81,7 @@ async def refresh_tokens(refresh_token: str) -> TokenPair:
 
     if stored != refresh_token:
         await redis.delete(f"refresh:{user_id}")
+        logger.warning("Refresh token reuse detected for user_id: %s", user_id)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Refresh token reused or expired",
@@ -100,7 +105,7 @@ async def _issue_token_pair(user_id: str) -> TokenPair:
     refresh = create_refresh_token(user_id)
 
     ttl = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
-    await redis.setex(f"refresh:{user_id}", int(ttl.total_seconds()), refresh)
+    await redis.set(f"refresh:{user_id}", refresh, ex=int(ttl.total_seconds()))
 
     return TokenPair(access_token=access, refresh_token=refresh)
 
@@ -110,6 +115,7 @@ async def _check_brute_force(email: str) -> None:
     attempts = await redis.get(key)
     if attempts and int(attempts) >= BRUTE_FORCE_MAX_ATTEMPTS:
         ttl = await redis.ttl(key)
+        logger.warning("Account locked due to brute force for email: %s", email)
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=f"Account locked. Try again in {ttl} seconds",
