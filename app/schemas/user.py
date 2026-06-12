@@ -13,6 +13,8 @@ class UserCreate(BaseModel):
             raise ValueError("Password must be at least 8 characters")
         if not any(c.isdigit() for c in v):
             raise ValueError("Password must contain at least one digit")
+        if not any(c.isalpha() for c in v):
+            raise ValueError("Password must contain at least one letter")
 
         return v
 
