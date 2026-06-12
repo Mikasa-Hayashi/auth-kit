@@ -27,6 +27,15 @@ async def flush_redis():
     await redis.flushdb()
 
 
+@pytest.fixture(autouse=True)
+async def clean_db():
+    yield
+    async with TestSessionLocal() as session:
+        for table in reversed(Base.metadata.sorted_tables):
+            await session.execute(table.delete())
+        await session.commit()
+
+
 @pytest.fixture
 async def db_session():
     async with TestSessionLocal() as session:
