@@ -11,6 +11,9 @@ WINDOW_SECONDS = 60
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         ip = request.client.host if request.client else None
+        if not ip:
+            return await call_next(request)
+
         key = f"rate:{ip}"
 
         count = await redis.incr(key)
