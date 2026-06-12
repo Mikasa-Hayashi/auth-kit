@@ -1,3 +1,4 @@
+from authlib.integrations.base_client.errors import OAuthError
 from authlib.integrations.starlette_client import OAuth
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -28,7 +29,7 @@ async def get_google_redirect(request: Request) -> str:
 async def handle_google_callback(request: Request, db: AsyncSession):
     try:
         token = await oauth.google.authorize_access_token(request)
-    except Exception:
+    except OAuthError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Google OAuth failed - invalid or expired state",
