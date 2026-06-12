@@ -7,6 +7,7 @@ from tests.factories import UserFactory
 async def test_brute_force_lockout(client: AsyncClient, db_session: AsyncSession):
     UserFactory._meta.sqlalchemy_session = db_session  # type: ignore
     user = UserFactory()
+    await db_session.flush()
 
     for _ in range(5):
         await client.post(
@@ -33,6 +34,7 @@ async def test_successful_login_clears_failures(
 ):
     UserFactory._meta.sqlalchemy_session = db_session  # type: ignore
     user = UserFactory()
+    await db_session.flush()
 
     for _ in range(4):
         await client.post(
@@ -67,5 +69,32 @@ async def test_successful_login_clears_failures(
             "email": user.email,
             "password": "wrongpassword",
         },
+    )
+    assert response.status_code == 429
+
+
+async def test_brute_force_counter_persists_across_attempts(
+    client: AsyncClient, db_session: AsyncSession
+):
+    """Verify that the counter isn't silently reset between slow attempts."""
+    UserFactory._meta.sqlalchemy_session = db_session  # type: ignore
+    user = UserFactory()
+    await db_session.flush()
+
+    for _ in range(4):
+        r = await client.post(
+            "/auth/login",
+            json={"email": user.email, "password": "wrongpassword"},
+        )
+        assert r.status_code == 401
+
+    await client.post(
+        "/auth/login",
+        json={"email": user.email, "password": "wrongpassword"},
+    )
+
+    response = await client.post(
+        "/auth/login",
+        json={"email": user.email, "password": "wrongpassword"},
     )
     assert response.status_code == 429
